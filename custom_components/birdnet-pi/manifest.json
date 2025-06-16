@@ -1,0 +1,13 @@
+{
+    "domain": "birdnet",
+    "name": "BirdNET-Pi",
+    "documentation": "https://github.com/djiesr/birdnet-ha",
+    "dependencies": [],
+    "codeowners": ["@djiesr"],
+    "requirements": ["requests>=2.0.0"],
+    "config_flow": true,
+    "version": "0.1.0",
+    "iot_class": "local_polling",
+    "issue_tracker": "https://github.com/djiesr/birdnet-ha/issues",
+    "homeassistant": "2023.8.0"
+}
