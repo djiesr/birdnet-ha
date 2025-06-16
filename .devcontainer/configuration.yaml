@@ -1,0 +1,14 @@
+default_config:
+
+birdnet:
+  host: "192.168.1.50"
+  port: 8080
+  scan_interval: 60
+
+logger:
+  default: info
+  logs:
+    custom_components.birdnet: debug
+
+# If you need to debug uncomment the line below (doc: https://www.home-assistant.io/integrations/debugpy/)
+# debugpy: 
