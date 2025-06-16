@@ -18,13 +18,5 @@ jobs:
       - name: Publish to HACS
         uses: hacs/action@main
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           category: integration
-          version: 1.0.0
-          name: BirdNET-Pi
-          description: BirdNET-Pi integration for Home Assistant
-          documentation: https://github.com/djiesr/birdnet-ha
-          issue_tracker: https://github.com/djiesr/birdnet-ha/issues
-          homeassistant: 2023.8.0
-          dependencies: []
-          codeowners: ["@djiesr"]
