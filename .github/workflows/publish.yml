@@ -1,0 +1,30 @@
+name: Publish to HACS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'custom_components/**'
+      - '.github/publish.yaml'
+      - 'README.md'
+      - 'LICENSE'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish to HACS
+        uses: hacs/action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
+          category: integration
+          version: 1.0.0
+          name: BirdNET-Pi
+          description: BirdNET-Pi integration for Home Assistant
+          documentation: https://github.com/djiesr/birdnet-ha
+          issue_tracker: https://github.com/djiesr/birdnet-ha/issues
+          homeassistant: 2023.8.0
+          dependencies: []
+          codeowners: ["@djiesr"]

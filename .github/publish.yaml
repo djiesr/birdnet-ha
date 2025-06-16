@@ -1,0 +1,20 @@
+name: Publish to HACS
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'custom_components/**'
+      - '.github/publish.yaml'
+      - 'README.md'
+      - 'LICENSE'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish to HACS
+        uses: hacs/action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
