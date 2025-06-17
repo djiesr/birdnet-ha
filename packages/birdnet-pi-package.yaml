@@ -1,0 +1,341 @@
+# BirdNET-Pi Package for Home Assistant
+# Replace {{ birdnet_pi_ip }} with your BirdNET-Pi device IP address
+
+homeassistant:
+  customize:
+    sensor.birdnet_*:
+      icon: mdi:bird
+
+input_select:
+  selected_bird_species:
+    name: Espèce sélectionnée
+    options:
+      - Choisir une espèce
+    icon: mdi:bird
+
+template:
+  - sensor:
+      - name: "BirdNET Species Timeline"
+        unique_id: birdnet_species_timeline
+        state: "ok"
+        attributes:
+          data: >
+            {% set selected_species = states('input_select.selected_bird_species') %}
+            {% if selected_species and selected_species != 'Choisir une espèce' %}
+              {% set sensor_id = 'sensor.birdnet_' + selected_species.lower().replace(' ', '_').replace("'", '').replace('é', 'e').replace('à', 'a').replace('ê', 'e').replace('è', 'e') %}
+              {% if states(sensor_id) != 'unknown' %}
+                {% set count = states(sensor_id) | int(0) %}
+                {% set date = now().strftime('%Y-%m-%d') %}
+                [{'date': date, 'count': count}]
+              {% else %}
+                []
+              {% endif %}
+            {% else %}
+              []
+            {% endif %}
+
+      # Détections aujourd'hui
+      - name: "BirdNET Detections Today"
+        unique_id: birdnet_detections_today
+        state: >
+          {% set count = states('sensor.birdnet_detected_today') | int(0) %}
+          {{ count }}
+        attributes:
+          species: "{{ states('sensor.birdnet_species_today') | int(0) }}"
+          last_update: "{{ now().isoformat() }}"
+
+      # Détections cette semaine
+      - name: "BirdNET Detections This Week"
+        unique_id: birdnet_detections_this_week
+        state: >
+          {{ states('sensor.birdnet_weekly_detections') | int(0) }}
+        attributes:
+          species: "{{ state_attr('sensor.birdnet_weekly_detections', 'species_count') | int(0) }}"
+
+      # Détections ce mois
+      - name: "BirdNET Detections This Month"
+        unique_id: birdnet_detections_this_month
+        state: >
+          {{ states('sensor.birdnet_monthly_detections') | int(0) }}
+        attributes:
+          species: "{{ state_attr('sensor.birdnet_monthly_detections', 'species_count') | int(0) }}"
+
+      # Détections cette année
+      - name: "BirdNET Detections This Year"
+        unique_id: birdnet_detections_this_year
+        state: >
+          {{ states('sensor.birdnet_yearly_detections') | int(0) }}
+        attributes:
+          species: "{{ state_attr('sensor.birdnet_yearly_detections', 'species_count') | int(0) }}"
+
+      # Détections par heure aujourd'hui
+      - name: "BirdNET Hourly Detections"
+        unique_id: birdnet_hourly_detections
+        state: >
+          {% set current_hour = now().strftime('%Y-%m-%d %H:00:00') %}
+          {% set count = 0 %}
+          {% for state in states.sensor if state.entity_id.startswith('sensor.birdnet_species_') %}
+            {% if state.last_changed.strftime('%Y-%m-%d %H:00:00') == current_hour %}
+              {% set count = count + (state.state | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ count }}
+        attributes:
+          hour: "{{ now().hour }}"
+
+      # Top 10 des espèces (version simplifiée)
+      - name: "BirdNET Top 10 Species Count"
+        unique_id: birdnet_top_10_species
+        state: >
+          {% set ns = namespace(total=0) %}
+          {% for state in states.sensor if state.entity_id.startswith('sensor.birdnet_species_') %}
+            {% set ns.total = ns.total + 1 %}
+          {% endfor %}
+          {{ ns.total }}
+        attributes:
+          species_list: >
+            {% set species_list = [] %}
+            {% for state in states.sensor if state.entity_id.startswith('sensor.birdnet_species_') %}
+              {% set name = state.attributes.friendly_name | replace('Bird Species - ', '') %}
+              {% set count = state.state | int(0) %}
+              {% set species_list = species_list + [name + ": " + count|string] %}
+            {% endfor %}
+            {{ species_list[:10] }}
+
+      # Capteurs pour les tendances
+      - name: "BirdNET Daily Trend"
+        unique_id: birdnet_daily_trend
+        state: "{{ states('sensor.birdnet_daily_history') }}"
+        attributes:
+          data: >
+            {% set history = state_attr('sensor.birdnet_daily_history', 'history') %}
+            {% if history %}
+              {% set result = [] %}
+              {% for item in history %}
+                {% set result = result + [{'date': item.date, 'detections': item.detection_count, 'species': item.species_count}] %}
+              {% endfor %}
+              {{ result }}
+            {% else %}
+              []
+            {% endif %}
+
+      - name: "BirdNET Weekly Trend"
+        unique_id: birdnet_weekly_trend
+        state: "{{ states('sensor.birdnet_weekly_history') }}"
+        attributes:
+          data: >
+            {% set history = state_attr('sensor.birdnet_weekly_history', 'history') %}
+            {% if history %}
+              {% set result = [] %}
+              {% for item in history %}
+                {% set result = result + [{'week': item.week, 'detections': item.detection_count, 'species': item.species_count}] %}
+              {% endfor %}
+              {{ result }}
+            {% else %}
+              []
+            {% endif %}
+
+      - name: "BirdNET Monthly Trend"
+        unique_id: birdnet_monthly_trend
+        state: "{{ states('sensor.birdnet_monthly_history') }}"
+        attributes:
+          data: >
+            {% set history = state_attr('sensor.birdnet_monthly_history', 'history') %}
+            {% if history %}
+              {% set result = [] %}
+              {% for item in history %}
+                {% set result = result + [{'month': item.month, 'detections': item.detection_count, 'species': item.species_count}] %}
+              {% endfor %}
+              {{ result }}
+            {% else %}
+              []
+            {% endif %}
+
+      - name: "BirdNET Yearly Trend"
+        unique_id: birdnet_yearly_trend
+        state: "{{ states('sensor.birdnet_yearly_history') }}"
+        attributes:
+          data: >
+            {% set history = state_attr('sensor.birdnet_yearly_history', 'history') %}
+            {% if history %}
+              {% set result = [] %}
+              {% for item in history %}
+                {% set result = result + [{'year': item.year, 'detections': item.detection_count, 'species': item.species_count}] %}
+              {% endfor %}
+              {{ result }}
+            {% else %}
+              []
+            {% endif %}
+
+      # Capteurs pour les statistiques détaillées
+      - name: "BirdNET Statistics Summary"
+        unique_id: birdnet_statistics_summary
+        state: "ok"
+        attributes:
+          daily_detections: "{{ states('sensor.birdnet_daily_detections') }}"
+          weekly_detections: "{{ states('sensor.birdnet_weekly_detections') }}"
+          monthly_detections: "{{ states('sensor.birdnet_monthly_detections') }}"
+          yearly_detections: "{{ states('sensor.birdnet_yearly_detections') }}"
+          daily_species: "{{ state_attr('sensor.birdnet_daily_detections', 'species_count') }}"
+          weekly_species: "{{ state_attr('sensor.birdnet_weekly_detections', 'species_count') }}"
+          monthly_species: "{{ state_attr('sensor.birdnet_monthly_detections', 'species_count') }}"
+          yearly_species: "{{ state_attr('sensor.birdnet_yearly_detections', 'species_count') }}"
+
+      - name: "Selected Bird Species Entity"
+        state: >-
+          {% set selected = states('input_select.selected_bird_species') %}
+          {{ 'sensor.birdnet_species_' + selected | lower | replace(' ', '_') | replace("'", '') | replace('é', 'e') | replace('à', 'a') | replace('ê', 'e') | replace('è', 'e') | replace('ç', 'c') }}
+
+      - name: "BirdNET Species List"
+        unique_id: birdnet_species_list
+        state: "{{ state_attr('sensor.birdnet_bird_species_today', 'species_list') | length }}"
+        attributes:
+          species_list: "{{ state_attr('sensor.birdnet_bird_species_today', 'species_list') }}"
+
+rest:
+  # Statistiques quotidiennes
+  - resource: http://{{ birdnet_pi_ip }}:5000/api/stats/daily
+    scan_interval: 600
+    sensor:
+      - name: "BirdNET Daily Detections"
+        value_template: "{{ value_json[0].detection_count if value_json and value_json[0] else 0 }}"
+        json_attributes_path: "$.[0]"
+        json_attributes:
+          - species_count
+          - date
+
+      - name: "BirdNET Daily History"
+        value_template: "{{ value_json | length }}"
+        json_attributes:
+          history: "{{ value_json }}"
+
+  # Statistiques hebdomadaires
+  - resource: http://{{ birdnet_pi_ip }}:5000/api/stats/weekly
+    scan_interval: 3600
+    sensor:
+      - name: "BirdNET Weekly Detections"
+        value_template: "{{ value_json[0].detection_count if value_json and value_json[0] else 0 }}"
+        json_attributes_path: "$.[0]"
+        json_attributes:
+          - species_count
+          - week
+
+      - name: "BirdNET Weekly History"
+        value_template: "{{ value_json | length }}"
+        json_attributes:
+          history: "{{ value_json }}"
+
+  # Statistiques mensuelles
+  - resource: http://{{ birdnet_pi_ip }}:5000/api/stats/monthly
+    scan_interval: 3600
+    sensor:
+      - name: "BirdNET Monthly Detections"
+        value_template: "{{ value_json[0].detection_count if value_json and value_json[0] else 0 }}"
+        json_attributes_path: "$.[0]"
+        json_attributes:
+          - species_count
+          - month
+
+      - name: "BirdNET Monthly History"
+        value_template: "{{ value_json | length }}"
+        json_attributes:
+          history: "{{ value_json }}"
+
+  # Statistiques annuelles
+  - resource: http://{{ birdnet_pi_ip }}:5000/api/stats/yearly
+    scan_interval: 86400
+    sensor:
+      - name: "BirdNET Yearly Detections"
+        value_template: "{{ value_json[0].detection_count if value_json and value_json[0] else 0 }}"
+        json_attributes_path: "$.[0]"
+        json_attributes:
+          - species_count
+          - year
+
+      - name: "BirdNET Yearly History"
+        value_template: "{{ value_json | length }}"
+        json_attributes:
+          history: "{{ value_json }}"
+
+rest_command:
+  get_birdnet_species_timeline:
+    url: "http://{{ birdnet_pi_ip }}:5000/api/stats/species_timeline/{{ states('input_select.selected_bird_species') }}"
+    method: GET
+
+automation:
+  # Mise à jour de la liste des espèces pour le sélecteur
+  - alias: "BirdNET - Update Species Selector"
+    triggers:
+      - trigger: state
+        entity_id: sensor.birdnet_species_count
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: input_select.set_options
+        target:
+          entity_id: input_select.selected_bird_species
+        data:
+          options: >
+            {% set species_list = state_attr('sensor.birdnet_species_count', 'species_list') or [] %}
+            {{ ['Choisir une espèce'] + species_list }}
+
+  # Notification lors de la détection d'une nouvelle espèce
+  - alias: "BirdNET - New Species Notification"
+    triggers:
+      - trigger: state
+        entity_id: sensor.birdnet_bird_species_today
+    condition:
+      - condition: template
+        value_template: "{{ trigger.to_state.state | int > trigger.from_state.state | int }}"
+    actions:
+      - action: notify.mobile_app_samsung_s21
+        data:
+          title: "Nouvelle espèce détectée!"
+          message: >
+            Une nouvelle espèce d'oiseau a été détectée: 
+            {{ state_attr('sensor.birdnet_last_bird_detection', 'common_name') }}!
+            Total des espèces aujourd'hui: {{ states('sensor.birdnet_bird_species_today') }}
+
+  # Mise à jour des statistiques de l'espèce sélectionnée
+  - alias: "BirdNET - Update Selected Species Stats"
+    triggers:
+      - trigger: state
+        entity_id: input_select.selected_bird_species
+    condition:
+      - condition: template
+        value_template: "{{ not is_state('input_select.selected_bird_species', 'Choisir une espèce') }}"
+    actions:
+      - action: rest_command.get_birdnet_species_timeline
+
+  # Lecteur audio simulé pour les détections
+  - alias: "BirdNET - Simulate Media Player"
+    triggers:
+      - trigger: event
+        event_type: birdnet_play_audio
+    actions:
+      - action: notify.persistent_notification
+        data:
+          title: "Lecture Audio BirdNET"
+          message: "Lecture du fichier audio: {{ trigger.event.data.audio_file }}"
+
+# Media player virtuel pour la lecture des fichiers audio
+media_player:
+  - platform: universal
+    name: BirdNET Audio
+    children:
+      - media_player.living_room_speaker # Remplacez par votre haut-parleur ou appareil de lecture
+
+script:
+  play_bird_audio:
+    alias: "Jouer l'audio d'oiseau"
+    sequence:
+      - action: media_player.play_media
+        target:
+          entity_id: media_player.birdnet_audio
+        data:
+          media_content_type: music
+          media_content_id: >
+            {% set detections = state_attr('sensor.birdnet_last_bird_detection', 'extra_state_attributes') %}
+            {% if detections and detections.audio_file %}
+              http://{{ birdnet_pi_ip }}:5000/api/audio/{{ detections.audio_file }}
+            {% endif %} 

@@ -14,6 +14,7 @@ This Home Assistant integration allows you to connect your BirdNET-Pi instance t
 - List of detected species
 - Server connection status
 - Customizable update interval
+- **Comprehensive YAML package** with additional sensors, automations, and templates
 
 ## Prerequisites
 
@@ -47,6 +48,50 @@ This Home Assistant integration allows you to connect your BirdNET-Pi instance t
 4. Enter your BirdNET-Pi server's IP address and port
 5. Configure the update interval according to your needs
 
+## Package Installation
+
+This integration includes a comprehensive YAML package that provides additional sensors, automations, and templates for enhanced functionality.
+
+### Package Features
+
+- **Template sensors** for trends and statistics
+- **Automations** for notifications and data management
+- **REST sensors** for historical data
+- **Media player integration** for audio playback
+- **Input select** for species selection
+
+### Installing the Package
+
+1. Download the `packages/birdnet-pi-package.yaml` file
+2. Replace `{{ birdnet_pi_ip }}` with your BirdNET-Pi device IP address
+3. Copy the file to your Home Assistant `config/packages/` directory
+4. Add the following to your `configuration.yaml`:
+
+```yaml
+homeassistant:
+  packages: !include_dir_named packages
+```
+
+5. Restart Home Assistant
+
+### Package Configuration
+
+Before using the package, make sure to:
+
+1. **Replace the IP address**: Edit the package file and replace all instances of `{{ birdnet_pi_ip }}` with your actual BirdNET-Pi device IP address
+2. **Configure media players**: Update the `media_player.living_room_speaker` reference in the package with your actual media player entity
+3. **Adjust notification settings**: Modify the notification entity in automations to match your setup
+
+### Package Components
+
+The package includes:
+
+- **Template sensors** for timeline data, trends, and statistics
+- **REST sensors** for daily, weekly, monthly, and yearly statistics
+- **Automations** for species selection updates and notifications
+- **Scripts** for audio playback
+- **Media player** configuration for audio output
+
 ## Available Entities
 
 ### Sensors
@@ -58,6 +103,14 @@ This Home Assistant integration allows you to connect your BirdNET-Pi instance t
 
 ### Binary Sensors
 - Server connection status
+
+### Package Sensors
+
+The package adds additional sensors for:
+- Historical trends (daily, weekly, monthly, yearly)
+- Hourly detection counts
+- Top 10 species rankings
+- Statistical summaries
 
 ## Customization
 
@@ -84,3 +137,18 @@ Contributions are welcome! Feel free to:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [BirdNET-Pi](https://github.com/mcguirepr89/BirdNET-Pi) - The original BirdNET-Pi project
+- [Home Assistant](https://www.home-assistant.io/) - The home automation platform
+- [HACS](https://hacs.xyz/) - Home Assistant Community Store
+
+## Changelog
+
+### Version 0.1.0
+- Initial release
+- Basic sensor integration
+- Multi-language support (English/French)
+- Comprehensive YAML package
+- Audio playback functionality
