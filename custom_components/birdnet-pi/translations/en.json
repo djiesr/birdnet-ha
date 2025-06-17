@@ -1,0 +1,17 @@
+{
+    "entity": {
+        "sensor": {
+            "birdnet": {
+                "last_detection": {
+                    "name": "Last Bird Detection"
+                },
+                "today_count": {
+                    "name": "Birds Detected Today"
+                },
+                "species_count": {
+                    "name": "Bird Species Today"
+                }
+            }
+        }
+    }
+} 

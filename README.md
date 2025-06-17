@@ -4,83 +4,83 @@
 [![maintainer](https://img.shields.io/badge/maintainer-%40djiesr-blue.svg)](https://github.com/djiesr)
 [![fr](https://img.shields.io/badge/lang-fr-yellow.svg)](https://github.com/djiesr/birdnet-ha/blob/main/README.md)
 
-Cette intégration Home Assistant permet de connecter votre instance BirdNET-Pi à Home Assistant, offrant ainsi un suivi en temps réel des détections d'oiseaux et des statistiques.
+This Home Assistant integration allows you to connect your BirdNET-Pi instance to Home Assistant, providing real-time bird detection monitoring and statistics.
 
-## Fonctionnalités
+## Features
 
-- Suivi en temps réel des détections d'oiseaux
-- Statistiques quotidiennes des espèces détectées
-- Nombre total de détections par jour
-- Liste des espèces détectées
-- État de connexion au serveur BirdNET-Pi
-- Personnalisation de l'intervalle de mise à jour
+- Real-time bird detection monitoring
+- Daily species detection statistics
+- Total detections count per day
+- List of detected species
+- Server connection status
+- Customizable update interval
 
-## Prérequis
+## Prerequisites
 
-- Une instance BirdNET-Pi fonctionnelle (voir [BirdNET-Pi](https://github.com/mcguirepr89/BirdNET-Pi))
-- Home Assistant version 2023.8.0 ou supérieure
-- HACS (optionnel, mais recommandé pour l'installation)
+- A working BirdNET-Pi instance (see [BirdNET-Pi](https://github.com/mcguirepr89/BirdNET-Pi))
+- Home Assistant version 2023.8.0 or higher
+- HACS (optional, but recommended for installation)
 
 ## Installation
 
-### Méthode 1 : Via HACS (Recommandée)
+### Method 1: Via HACS (Recommended)
 
-1. Assurez-vous que [HACS](https://hacs.xyz/) est installé
-2. Dans HACS, allez dans "Intégrations"
-3. Cliquez sur les trois points en haut à droite
-4. Sélectionnez "Dépôts personnalisés"
-5. Ajoutez `https://github.com/djiesr/birdnet-ha`
-6. Recherchez "BirdNET-Pi" dans HACS
-7. Cliquez sur "Télécharger"
+1. Make sure [HACS](https://hacs.xyz/) is installed
+2. In HACS, go to "Integrations"
+3. Click the three dots in the top right
+4. Select "Custom repositories"
+5. Add `https://github.com/djiesr/birdnet-ha`
+6. Search for "BirdNET-Pi" in HACS
+7. Click "Download"
 
-### Méthode 2 : Installation manuelle
+### Method 2: Manual Installation
 
-1. Téléchargez ce dépôt
-2. Copiez le dossier `birdnet-pi` dans votre dossier `custom_components`
-3. Redémarrez Home Assistant
+1. Download this repository
+2. Copy the `birdnet-pi` folder to your `custom_components` folder
+3. Restart Home Assistant
 
 ## Configuration
 
-1. Dans Home Assistant, allez dans "Paramètres" > "Appareils et services"
-2. Cliquez sur "Ajouter une intégration"
-3. Recherchez "BirdNET-Pi"
-4. Entrez l'adresse IP et le port de votre serveur BirdNET-Pi
-5. Configurez l'intervalle de mise à jour selon vos besoins
+1. In Home Assistant, go to "Settings" > "Devices & Services"
+2. Click "Add Integration"
+3. Search for "BirdNET-Pi"
+4. Enter your BirdNET-Pi server's IP address and port
+5. Configure the update interval according to your needs
 
-## Entités disponibles
+## Available Entities
 
-### Capteurs (Sensors)
-- Dernières détections
-- Nombre total de détections aujourd'hui
-- Nombre d'espèces détectées aujourd'hui
-- Liste des espèces détectées aujourd'hui
-- Statistiques quotidiennes
+### Sensors
+- Latest detections
+- Total detections today
+- Number of species detected today
+- List of species detected today
+- Daily statistics
 
-### Capteurs binaires (Binary Sensors)
-- État de connexion au serveur BirdNET-Pi
+### Binary Sensors
+- Server connection status
 
-## Personnalisation
+## Customization
 
-Vous pouvez personnaliser l'intervalle de mise à jour dans les options de l'intégration :
-1. Allez dans "Paramètres" > "Appareils et services"
-2. Trouvez l'intégration BirdNET-Pi
-3. Cliquez sur "Configurer"
-4. Ajustez l'intervalle de mise à jour selon vos besoins
+You can customize the update interval in the integration options:
+1. Go to "Settings" > "Devices & Services"
+2. Find the BirdNET-Pi integration
+3. Click "Configure"
+4. Adjust the update interval according to your needs
 
 ## Support
 
-Si vous rencontrez des problèmes ou avez des questions :
-- Ouvrez une issue sur GitHub
-- Vérifiez que votre serveur BirdNET-Pi est accessible
-- Assurez-vous que les ports sont correctement configurés
+If you encounter any issues or have questions:
+- Open an issue on GitHub
+- Verify that your BirdNET-Pi server is accessible
+- Make sure the ports are correctly configured
 
-## Contribution
+## Contributing
 
-Les contributions sont les bienvenues ! N'hésitez pas à :
-- Ouvrir une issue pour signaler un bug
-- Proposer une pull request pour améliorer l'intégration
-- Améliorer la documentation
+Contributions are welcome! Feel free to:
+- Open an issue to report a bug
+- Submit a pull request to improve the integration
+- Improve the documentation
 
-## Licence
+## License
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

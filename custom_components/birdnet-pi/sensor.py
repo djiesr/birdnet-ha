@@ -7,9 +7,9 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-)
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.translation import async_get_translations
 
 from .const import COORDINATOR, DOMAIN, SENSOR_TYPES
 
@@ -30,7 +30,6 @@ async def async_setup_entry(
                 coordinator,
                 entry,
                 sensor_type,
-                sensor_info["name"],
                 sensor_info["icon"],
                 sensor_info["device_class"],
                 sensor_info["state_class"],
@@ -67,7 +66,6 @@ class BirdNETSensor(CoordinatorEntity, SensorEntity):
         coordinator,
         entry,
         sensor_type,
-        name,
         icon,
         device_class,
         state_class,
@@ -77,7 +75,6 @@ class BirdNETSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self._entry = entry
         self._sensor_type = sensor_type
-        self._name = name
         self._icon = icon
         self._device_class = device_class
         self._state_class = state_class
@@ -93,7 +90,7 @@ class BirdNETSensor(CoordinatorEntity, SensorEntity):
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        return f"BirdNET {self._name}"
+        return self.hass.states.get(self.entity_id).attributes.get("friendly_name", f"BirdNET {self._sensor_type}")
 
     @property
     def icon(self) -> str:
@@ -116,15 +113,15 @@ class BirdNETSensor(CoordinatorEntity, SensorEntity):
         return self._unit_of_measurement
 
     @property
-    def device_info(self):
+    def device_info(self) -> DeviceInfo:
         """Return device information."""
-        return {
-            "identifiers": {(DOMAIN, self._entry.entry_id)},
-            "name": f"BirdNET-Pi ({self._entry.data['host']})",
-            "manufacturer": "BirdNET",
-            "model": "BirdNET-Pi Bridge",
-            "sw_version": "0.1.0",
-        }
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._entry.entry_id)},
+            name=f"BirdNET-Pi ({self._entry.data['host']})",
+            manufacturer="BirdNET",
+            model="BirdNET-Pi Bridge",
+            sw_version="0.1.0",
+        )
 
     @property
     def available(self) -> bool:
@@ -207,7 +204,6 @@ class BirdNETSpeciesSensor(BirdNETSensor):
             coordinator,
             entry,
             sensor_type,
-            species_name,
             icon,
             device_class,
             state_class,
@@ -220,7 +216,7 @@ class BirdNETSpeciesSensor(BirdNETSensor):
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        return f"{self._species_name}"  # Juste le nom de l'espèce
+        return self._species_name
 
     @property
     def available(self) -> bool:
@@ -249,24 +245,17 @@ class BirdNETSpeciesSensor(BirdNETSensor):
         if not self.coordinator.data or "today_detections" not in self.coordinator.data:
             return attrs
             
-        # Get latest detection for this species
-        latest = None
-        latest_time = ""
-        
+        # Add all detections for this species
+        detections = []
         for detection in self.coordinator.data["today_detections"]:
             if detection.get("common_name", "") == self._species_name:
-                # Check if this is the latest detection
-                detection_time = f"{detection.get('date', '')} {detection.get('time', '')}"
-                if not latest_time or detection_time > latest_time:
-                    latest = detection
-                    latest_time = detection_time
+                detections.append({
+                    "scientific_name": detection.get("scientific_name", ""),
+                    "confidence": detection.get("confidence", 0),
+                    "date": detection.get("date", ""),
+                    "time": detection.get("time", ""),
+                    "audio_file": detection.get("audio_file", ""),
+                })
         
-        if latest:
-            attrs = {
-                "scientific_name": latest.get("scientific_name", ""),
-                "last_confidence": latest.get("confidence", 0),
-                "last_detection_time": latest.get("time", ""),
-                "last_audio_file": latest.get("audio_file", ""),
-            }
-            
+        attrs["detections"] = detections
         return attrs
