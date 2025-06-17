@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - master
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
 jobs:
   draft_release:
     name: Release Drafter
