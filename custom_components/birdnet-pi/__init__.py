@@ -10,7 +10,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.helpers import async_forward_entry_setup, async_forward_entry_unload
 
 from .const import COORDINATOR, DOMAIN
 
@@ -52,8 +51,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     # Set up all platforms
-    for platform in PLATFORMS:
-        await async_forward_entry_setup(hass, entry, platform)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.add_update_listener(async_update_entry)
     return True
@@ -69,7 +67,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = all(
         await asyncio.gather(
             *[
-                await async_forward_entry_unload(hass, entry, platform)
+                hass.config_entries.async_forward_entry_unload(entry, platform)
                 for platform in PLATFORMS
             ]
         )
