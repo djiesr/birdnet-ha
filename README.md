@@ -149,7 +149,7 @@ Install the following HACS frontend modules:
    - Copy `packages/birdnet-dashboard.yaml` to your Home Assistant configuration
 
 2. **Update the IP address**:
-   - Replace `192.168.1.50` with your BirdNET-Pi device IP address in the dashboard file
+   - Replace `{{ birdnet_pi_ip }}` with your BirdNET-Pi device IP address in the dashboard file
 
 3. **Create image directory** (optional):
    ```bash
@@ -174,7 +174,7 @@ Install the following HACS frontend modules:
 
 #### Audio Configuration
 - The dashboard includes audio players for bird calls
-- Audio files are streamed directly from your BirdNET-Pi device
+- Audio files are streamed directly from your BirdNET-Pi device at `http://{{ birdnet_pi_ip }}:5000/api/audio/`
 - Ensure your BirdNET-Pi device is accessible on the network
 
 #### Color Themes
