@@ -72,16 +72,30 @@ template:
       - name: "BirdNET Hourly Detections"
         unique_id: birdnet_hourly_detections
         state: >
-          {% set current_hour = now().strftime('%Y-%m-%d %H:00:00') %}
+          {% set current_hour = now().strftime('%H') %}
           {% set count = 0 %}
           {% for state in states.sensor if state.entity_id.startswith('sensor.birdnet_species_') %}
-            {% if state.last_changed.strftime('%Y-%m-%d %H:00:00') == current_hour %}
+            {% if state.last_changed.strftime('%Y-%m-%d %H') == now().strftime('%Y-%m-%d %H') %}
               {% set count = count + (state.state | int(0)) %}
             {% endif %}
           {% endfor %}
           {{ count }}
         attributes:
           hour: "{{ now().hour }}"
+          last_update: "{{ now().isoformat() }}"
+          history: >
+            {% set history = [] %}
+            {% for hour in range(24) %}
+              {% set hour_str = '%02d' % hour %}
+              {% set count = 0 %}
+              {% for state in states.sensor if state.entity_id.startswith('sensor.birdnet_species_') %}
+                {% if state.last_changed.strftime('%Y-%m-%d %H') == now().strftime('%Y-%m-%d ') + hour_str %}
+                  {% set count = count + (state.state | int(0)) %}
+                {% endif %}
+              {% endfor %}
+              {% set history = history + [{'hour': hour_str, 'count': count}] %}
+            {% endfor %}
+            {{ history }}
 
       # Top 10 des espèces (version simplifiée)
       - name: "BirdNET Top 10 Species Count"
@@ -278,6 +292,24 @@ automation:
           options: >
             {% set species_list = state_attr('sensor.birdnet_species_count', 'species_list') or [] %}
             {{ ['Choisir une espèce'] + species_list }}
+
+  # Mise à jour des statistiques au démarrage
+  - alias: "BirdNET - Update Statistics on Startup"
+    triggers:
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: service
+        service: rest_command.get_birdnet_species_timeline
+      - action: service
+        service: homeassistant.update_entity
+        target:
+          entity_id:
+            - sensor.birdnet_daily_detections
+            - sensor.birdnet_weekly_detections
+            - sensor.birdnet_monthly_detections
+            - sensor.birdnet_yearly_detections
+            - sensor.birdnet_hourly_detections
 
   # Notification lors de la détection d'une nouvelle espèce
   - alias: "BirdNET - New Species Notification"

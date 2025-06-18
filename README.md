@@ -92,6 +92,115 @@ The package includes:
 - **Scripts** for audio playback
 - **Media player** configuration for audio output
 
+## Dashboard
+
+This integration includes a comprehensive dashboard template that provides a beautiful and functional interface for monitoring your BirdNET-Pi data.
+
+### Dashboard Features
+
+The dashboard is organized into four main views:
+
+#### 1. **Oiseaux** (Birds) - Main View
+- **Latest Detection**: Shows the most recent bird detection with photo and audio player
+- **Quick Statistics**: Displays detections, species count, activity status, and hourly detections
+- **Daily Trends**: 7-day graph showing detections and species counts
+- **Hourly Activity**: Real-time chart of detections by hour for the current day
+- **Detection Statistics**: Detailed breakdown by time period (today, week, month, year)
+- **Top Species**: Auto-generated list of the most detected species today
+
+#### 2. **Analyses** (Analysis) - Advanced Analytics
+- **Period Comparison**: Side-by-side comparison of daily, weekly, and monthly data
+- **Hourly Activity Chart**: Detailed hourly breakdown with data labels
+- **Species Selection**: Interactive dropdown to select and analyze specific species
+- **Species Details**: Shows scientific name, confidence level, and last detection time
+- **Species Timeline**: 30-day chart showing detection patterns for selected species
+
+#### 3. **Statistiques** (Statistics) - Historical Data
+- **Detection Evolution**: 90-day trend analysis with stacked charts
+- **Daily Comparisons**: Side-by-side graphs for daily detections and species counts
+- **Top 10 Species**: Pie chart showing the most detected species overall
+- **Statistical Summary**: Comprehensive overview of all time periods
+
+#### 4. **Liste des Espèces** (Species List) - Complete Inventory
+- **All Detected Species**: Complete list of all species with detection counts
+- **Species Details**: Popup with scientific names and detection statistics
+- **Sortable List**: Species sorted by detection frequency
+
+### Dashboard Installation
+
+#### Prerequisites
+
+Install the following HACS frontend modules:
+
+```bash
+# Required HACS Frontend Modules
+- ApexCharts Card (custom:apexcharts-card)
+- Mushroom Cards (custom:mushroom-chips-card)
+- Mini Graph Card (custom:mini-graph-card)
+- Auto Entities (custom:auto-entities)
+- Mushroom Template Card (custom:mushroom-template-card)
+- Multiple Entity Row (custom:multiple-entity-row)
+- Browser Mod (browser_mod)
+```
+
+#### Installation Steps
+
+1. **Download the dashboard file**:
+   - Copy `packages/birdnet-dashboard.yaml` to your Home Assistant configuration
+
+2. **Update the IP address**:
+   - Replace `192.168.1.50` with your BirdNET-Pi device IP address in the dashboard file
+
+3. **Create image directory** (optional):
+   ```bash
+   # Create directory for bird images
+   mkdir -p config/www/images/birds/
+   ```
+
+4. **Add to your configuration**:
+   ```yaml
+   # In your configuration.yaml or dashboard configuration
+   views: !include packages/birdnet-dashboard.yaml
+   ```
+
+5. **Restart Home Assistant**
+
+### Dashboard Customization
+
+#### Image Setup
+- Place bird images in `config/www/images/birds/`
+- Use the format: `species_name.jpg` (e.g., `merle_damerique.jpg`)
+- Images should be in JPG format for best compatibility
+
+#### Audio Configuration
+- The dashboard includes audio players for bird calls
+- Audio files are streamed directly from your BirdNET-Pi device
+- Ensure your BirdNET-Pi device is accessible on the network
+
+#### Color Themes
+- The dashboard uses Home Assistant's CSS variables for theming
+- Colors automatically adapt to your current theme
+- Custom colors can be modified in the dashboard configuration
+
+### Dashboard Features
+
+#### Real-time Updates
+- All charts and statistics update automatically
+- Data refreshes based on your BirdNET-Pi update interval
+- Historical data is preserved and displayed in trends
+
+#### Interactive Elements
+- Click on species to view detailed information
+- Audio playback for bird calls
+- Expandable statistics sections
+- Responsive design for mobile devices
+
+#### Data Visualization
+- Multiple chart types (line, bar, area, pie)
+- Color-coded data for easy interpretation
+- Zoom and pan capabilities on charts
+- Export functionality for data analysis
+
 ## Available Entities
 
 ### Sensors
